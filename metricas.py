@@ -7,13 +7,14 @@ class Metricas():
     df = pd.DataFrame(data)
     anomaliaMax = 2500
     anomaliaMin = 50
+    dfanomalias = pd.DataFrame()
 
     def detectarAnomalias(self):
          self.dfanomalias = pd.DataFrame(self.df.loc[self.df['dpm'] > self.anomaliaMax])
          return self.dfanomalias
 
-    def DataframeToJson(self):
-        dfjson = self.dfanomalias.to_json(index=False)
+    def DataframeToJson(self, dfanomalias):
+        dfjson = pd.DataFrame()(index=False,orient='split')
         return self.dfjson
 
     def diferenciaPorRegistro(self):
@@ -33,12 +34,16 @@ class Metricas():
 
     def sendMessage(self):
 
-        msg = self.dfjson
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+        msg = self.detectarAnomalias().to_json(index=False, orient='split')
+
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host='localhost'))
         channel = connection.channel()
-        channel.queue_declare(queue='metricas anomalias')
-        channel.basic_publish(exchange='', routing_key='metricas', body=msg)
-        print(" [x] sent 'msg")
+
+        channel.queue_declare(queue='hello')
+
+        channel.basic_publish(exchange='', routing_key='hello', body=str(msg))
+        print(" [x] Sent " + str(msg))
         connection.close()
 
 

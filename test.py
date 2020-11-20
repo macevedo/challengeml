@@ -1,4 +1,5 @@
 import pandas as pd
+import MySQLdb
 
 #testdataset.csv tiene 100 lineas.
 
@@ -24,22 +25,36 @@ class Tests():
         while j < 100:
             registro1 = self.df.dpm[i]
             registro2 = self.df.dpm[j]
-            #print(registro1)
-            #print(registro2)
             diferencia = (registro1/registro2)-1
             if diferencia < 0: diferencia = diferencia * -1
             diferencia = round(diferencia, 2)
-            #print(diferencia)
             j = j+1
             i = i+1
-            #print(j)
-            #print(i)
             if(diferencia > 0.1):
                 print("la diferencia porcentual entre "+str(registro1)+" y "+str(registro2) +" es de "+str(diferencia))
 
 
+""""
+df2 = pd.DataFrame({'uno': [1, 2, 3], 'dos': [4, 5, 6], 'tres': [7, 8, 9]}, index=['x', 'y', 'z'])
+# Iteración por filas del DataFrame:
+for indice_fila, fila in df2.iterrows():
+	print(indice_fila)
+	print(fila)
+"""
+
 test1 = Tests()
-print(Tests.testDetectarAnomalias(test1))
-print(Tests.testDetectarAnomalias(test1).count())
-print(Tests.testDataframeToJson(test1))
-print(Tests.testDiferenciaPorRegistro(test1))
+#print(Tests.testDetectarAnomalias(test1))
+##print(Tests.testDataframeToJson(test1))
+#rint(Tests.testDiferenciaPorRegistro(test1))
+df = Tests.testDetectarAnomalias(test1)
+##insert
+##
+db = MySQLdb.connect("localhost","root","qwe123.","challengeml" )
+cursor = db.cursor()
+
+cols = "`,`".join([str(i) for i in Tests.testDetectarAnomalias(test1).columns.tolist()])
+
+#print(df)
+
+for row in df.iterrows():
+    sql = "INSERT INTO `DATOSALERT` (`" + cols + "`) VALUES (" + "%s," * (len(row) - 1) + "%s)"
