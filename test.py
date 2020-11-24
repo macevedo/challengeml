@@ -58,3 +58,15 @@ cols = "`,`".join([str(i) for i in Tests.testDetectarAnomalias(test1).columns.to
 
 for row in df.iterrows():
     sql = "INSERT INTO `DATOSALERT` (`" + cols + "`) VALUES (" + "%s," * (len(row) - 1) + "%s)"
+
+#Test conecction dB
+db = MySQLdb.connect("localhost","root","qwe123.","challengeml" )
+# prepare a cursor object using cursor() method
+cursor = db.cursor()
+# execute SQL query using execute() method.
+cursor.execute("SELECT VERSION()")
+# Fetch a single row using fetchone() method.
+data = cursor.fetchone()
+print ("Database version : %s " % data)
+# disconnect from server
+db.close()
